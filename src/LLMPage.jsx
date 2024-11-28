@@ -1,29 +1,17 @@
-import React, { useState, useEffect } from 'react';
-    import SimFin from '../api/simfin';
-    import Ollama from '../api/ollama';
+import React, { useEffect } from 'react';
 
     function LLMPage({ financialData }) {
       const [llmAnalysis, setLlmAnalysis] = useState('');
       const [llmRecommendation, setLlmRecommendation] = useState('');
-      const [selectedLLM, setSelectedLLM] = useState('simfin');
 
       useEffect(() => {
         if (financialData) {
-          analyzeFinancials(financialData);
-        }
-      }, [financialData, selectedLLM]);
+          // Mock LLM analysis and recommendation
+          const balanceSheet = financialData.balance;
+          const cashFlow = financialData.cashFlow;
+          const derivedMetrics = financialData.derived;
 
-      const analyzeFinancials = async (data) => {
-        let analysis = '';
-        let recommendation = '';
-
-        if (selectedLLM === 'simfin') {
-          // Mock SIMFIN analysis
-          const balanceSheet = data.balance;
-          const cashFlow = data.cashFlow;
-          const derivedMetrics = data.derived;
-
-          analysis += "Based on the provided financial information, here is a summary of the company's finances:\n\n";
+          let analysis = "Based on the provided financial information, here is a summary of the company's finances:\n\n";
 
           // Balance Sheet Summary
           analysis += "1. Balance Sheet:\n";
@@ -47,41 +35,17 @@ import React, { useState, useEffect } from 'react';
           analysis += `   - Return on Assets: ${derivedMetrics["Profitability Metrics"]["Return on Assets"]}%\n`;
           analysis += `   - Return on Invested Capital: ${derivedMetrics["Profitability Metrics"]["Return On Invested Capital"]}%\n\n`;
 
-          recommendation = "The company has a strong balance sheet with a significant amount of assets compared to its liabilities, indicating a healthy financial position. The company generated positive cash flow from its operating activities but had negative cash flow from investing and financing activities, resulting in a decrease in cash during the period. The company has healthy profitability metrics, indicating efficient operations and good returns on investment.";
-        } else if (selectedLLM === 'ollama') {
-          // Use Ollama for analysis
-          const ollama = new Ollama();
-          const prompt = `Analyze the following financial data:\n\n${JSON.stringify(financialData, null, 2)}`;
-          try {
-            const response = await ollama.chat([{ role: 'user', content: prompt }], 'gpt-3.5-turbo');
-            analysis = response;
-            recommendation = "Based on the Ollama analysis, here is a recommendation.";
-          } catch (error) {
-            console.error(error);
-            analysis = "Error analyzing financial data with Ollama.";
-            recommendation = "No recommendation available.";
-          }
-        }
+          // Recommendation
+          const recommendation = "The company has a strong balance sheet with a significant amount of assets compared to its liabilities, indicating a healthy financial position. The company generated positive cash flow from its operating activities but had negative cash flow from investing and financing activities, resulting in a decrease in cash during the period. The company has healthy profitability metrics, indicating efficient operations and good returns on investment.";
 
-        setLlmAnalysis(analysis);
-        setLlmRecommendation(recommendation);
-      };
+          setLlmAnalysis(analysis);
+          setLlmRecommendation(recommendation);
+        }
+      }, [financialData]);
 
       return (
         <div>
           <h2>LLM Analysis and Recommendation</h2>
-          <div className="mb-4">
-            <label htmlFor="llmSelect" className="block text-gray-700 font-bold mb-2">Select LLM:</label>
-            <select
-              id="llmSelect"
-              value={selectedLLM}
-              onChange={(e) => setSelectedLLM(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            >
-              <option value="simfin">SIMFIN</option>
-              <option value="ollama">Ollama</option>
-            </select>
-          </div>
           {llmAnalysis ? (
             <>
               <p>{llmAnalysis}</p>
